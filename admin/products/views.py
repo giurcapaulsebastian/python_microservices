@@ -7,12 +7,14 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
 import random
+from .producer import publish
 
 # Create your views here.
 class ProductViewSet(viewsets.ViewSet):
     def list(self, request): #/api/prodcuts
         products = Product.objects.all()
         serializer = ProductSerializer(products, many=True)
+        publish('product_created', serializer.data)
         return Response(serializer.data) 
 
     def create(self, request): #/api/prodcuts
@@ -31,11 +33,13 @@ class ProductViewSet(viewsets.ViewSet):
         serializer = ProductSerializer(instance=product, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        publish('product_updated', serializer.data)
         return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     def destroy(self, request, pk=None): #/api/products/<str:id>
         product = Product.objects.get(id=pk)
         product.delete()
+        publish('product_deleted', pk)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
