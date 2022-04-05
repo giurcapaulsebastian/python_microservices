@@ -14,13 +14,13 @@ class ProductViewSet(viewsets.ViewSet):
     def list(self, request): #/api/prodcuts
         products = Product.objects.all()
         serializer = ProductSerializer(products, many=True)
-        publish('product_created', serializer.data)
         return Response(serializer.data) 
 
     def create(self, request): #/api/prodcuts
         serializer = ProductSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        publish('product_created', serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None): #/api/products/<str:id>
