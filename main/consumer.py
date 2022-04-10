@@ -29,8 +29,9 @@ def callback(ch, method, properties, body):
 
     elif properties.content_type == "product_deleted":
         product = Product.query.get(data)
-        db.session.delete(product)
-        db.session.commit()
+        if product:
+            db.session.delete(product)
+            db.session.commit()
         print("Product deleted!")
     print(body)
 
